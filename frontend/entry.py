@@ -3,13 +3,10 @@ import logging
 import flet as ft
 from flet_core import FilePickerResultEvent
 import requests
-from constants import HOST, PORT
+from constants import HEIGHT, SIZE
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
-
-SIZE = 15
-HEIGHT = 40
 
 
 def main(page: ft.Page):
@@ -66,4 +63,4 @@ def main(page: ft.Page):
     )
 
 
-ft.app(target=main, assets_dir="./assets")
+ft.app(target=main)
