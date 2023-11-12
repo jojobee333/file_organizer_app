@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, create_engine, Column, Integer, String
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
+from constants import DATABASE_URL
 
-DATABASE_URL = "sqlite:///mydatabase.db"
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(engine)
 

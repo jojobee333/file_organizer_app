@@ -8,8 +8,6 @@ from flet_core import MainAxisAlignment, FilePickerResultEvent
 from backend.api.routers import origin_route, target_route, format_route, move_route
 from constants import HOST, PORT
 
-DATABASE_URL = "sqlite+aiosqlite:///mydatabase.db"
-SIZE = 15
 # uvicorn backend.api.main:app --reload
 
 
