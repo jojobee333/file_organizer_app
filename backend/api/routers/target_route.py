@@ -19,7 +19,7 @@ def get_all_targets():
     # OK
     try:
         with Session() as session:
-            return base_route.get_all(session, Target)
+            return {"results": base_route.get_all(session, Target)}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
 

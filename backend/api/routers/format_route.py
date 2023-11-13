@@ -24,7 +24,7 @@ def get_all_formats():
     """Retrieves all saved formats."""
     try:
         with Session() as session:
-            return base_route.get_all(session, Format)
+            return {"results": base_route.get_all(session, Format)}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
 

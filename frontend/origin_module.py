@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class OriginControl(ft.UserControl):
     def __init__(self):
+
         super().__init__()
 
     def build(self):
@@ -68,14 +69,12 @@ class OriginControl(ft.UserControl):
 
             ]
         )
-        get_directory_dialog = ft.FilePicker(on_result=get_directory_result)
-        origin_text_field = ft.TextField(col=9, filled=True, disabled=True, border_radius=ft.border_radius.all(5),
+        get_origin_directory_dialog = ft.FilePicker(on_result=get_directory_result)
+        origin_text_field = ft.TextField(col=8, filled=True, disabled=True, border_radius=ft.border_radius.all(5),
                                          height=HEIGHT, text_size=SIZE)
-
-        choose_new_folder_btn = ft.ElevatedButton("Choose New Folder", col=2, icon=ft.icons.FOLDER_OPEN, height=HEIGHT,
-                                                  on_click=lambda _: get_directory_dialog.get_directory_path(),
+        choose_new_origin_btn = ft.ElevatedButton("Choose New Origin", col=3, icon=ft.icons.FOLDER_OPEN, height=HEIGHT,
+                                                  on_click=lambda _: get_origin_directory_dialog.get_directory_path(),
                                                   style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5)))
-
         add_origin_btn = ft.IconButton(
             col=1,
             icon=ft.icons.ADD,
@@ -86,16 +85,15 @@ class OriginControl(ft.UserControl):
             )
         )
 
-        origin_responsive_row = ft.ResponsiveRow(
+        return ft.ResponsiveRow(
             controls=[
                 origin_text_field,
-                choose_new_folder_btn,
                 add_origin_btn,
-                get_directory_dialog,
-                ft.Column(horizontal_alignment=ft.CrossAxisAlignment.STRETCH, col=12, height=300,
+                choose_new_origin_btn,
+
+                get_origin_directory_dialog,
+                ft.Column(horizontal_alignment=ft.CrossAxisAlignment.STRETCH, col=12, height=150,
                           scroll=ft.ScrollMode.ALWAYS, controls=[origin_data_table])
 
             ]
         )
-
-        return origin_responsive_row

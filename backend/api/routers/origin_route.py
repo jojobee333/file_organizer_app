@@ -19,7 +19,7 @@ def get_all_origins():
     """Retrieves all saved origin folders."""
     try:
         with Session() as session:
-            return base_route.get_all(session, Origin)
+            return {"results": base_route.get_all(session, Origin)}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
 
@@ -31,7 +31,9 @@ def add_new_origin(path: str):
     try:
         with Session() as session:
             result = base_route.add_new(session, Origin, path=path)
-            return {"code": 200, "message": "Origin added successfully", "id": result.id}
+            return {"code": 200,
+                    "message": "Origin added successfully",
+                    "id": result.id, "path": result.path}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
 
