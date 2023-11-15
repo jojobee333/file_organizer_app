@@ -1,45 +1,84 @@
 import os
 
 from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class BaseRoute:
-    @staticmethod
-    def get_all(session, model):
-        return session.query(model).all()
 
     @staticmethod
-    def add_new(session, model, **kwargs):
-        instance = model(**kwargs)
-        session.add(instance)
-        session.commit()
+    async def is_session_running(session: AsyncSession):
+        if not session.in_transaction():
+            return False
+        else:
+            return True
+
+    @staticmethod
+    async def get_all(session, model):
+        result = await session.execute(select(model))
+        return result.scalars().all()
+
+    @staticmethod
+    async def add_new(session, model, **kwargs):
+        # OK
+        session_running = await BaseRoute.is_session_running(session)
+        if not session_running:
+            async with session.begin():
+                instance = model(**kwargs)
+                session.add(instance)
+        await session.refresh(instance)
         return instance
 
     @staticmethod
-    def get_items(session, model, id):
-        instance = session.query(model).filter(model.id == id).first()
-        instance_path = instance.path
-        items = os.listdir(instance_path)
-        results = [item for item in items if os.path.isfile(os.path.join(instance_path, item))]
-        return results
+    async def get_items(session, model, id):
+        # OK
+        query = select(model).where(model.id == id)
+        result = await session.execute(query)
+        instance = result.scalars().first()
+        if instance:
+            instance_path = instance.path
+            items = os.listdir(instance_path)
+            results = [item for item in items if os.path.isfile(os.path.join(instance_path, item))]
+            return results
+        else:
+            return []
 
     @staticmethod
-    def get_by_id(session, model, id):
-        return session.query(model).filter(model.id == id).first()
+    async def get_by_id(session, model, id):
+        # OK
+        query = select(model).where(model.id == id)
+        result = await session.execute(query)
+        return result.scalars().first()
 
     @staticmethod
-    def update(session, model, id, **kwargs):
-        instance = session.query(model).filter(model.id == id).first()
-        for key, value in kwargs.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
-        session.add(instance)
-        session.commit()
+    async def update(session, model, id, **kwargs):
+        # OK
+        query = select(model).where(model.id == id)
+        result = await session.execute(query)
+        instance = result.scalars().first()
+        if instance is not None:
+            for key, value in kwargs.items():
+                if hasattr(instance, key):
+                    setattr(instance, key, value)
+            if not session.in_transaction():
+                async with session.begin():
+                    session.add(instance)
+            else:
+                session.add(instance)
+
+            return instance
+        else:
+            raise NoResultFound(f"Instance of {model.__name__} with ID {id} not found.")
 
     @staticmethod
-    def delete(session, model, id):
-        to_delete = session.query(model).filter(model.id == id).first()
-        if to_delete is None:
+    async def delete(session, model, id):
+        # OK
+        query = select(model).where(model.id == id)
+        result = await session.execute(query)
+        instance = result.scalars().first()
+        if instance is None:
             raise HTTPException(status_code=404, detail=f"{model} not found")
-        session.delete(to_delete)
-        session.commit()
+        await session.delete(instance)
+        await session.commit()

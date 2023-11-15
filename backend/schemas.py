@@ -1,11 +1,16 @@
-from sqlalchemy import ForeignKey, create_engine, Column, Integer, String
-from sqlalchemy.orm import relationship, sessionmaker, declarative_base
+import asyncio
+
+from sqlalchemy import ForeignKey, Column, Integer, String
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker, AsyncAttrs
+from sqlalchemy.orm import relationship, declarative_base, DeclarativeBase
 from constants import DATABASE_URL
 
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(engine)
+engine = create_async_engine(DATABASE_URL, echo=True)
+async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
-Base = declarative_base()
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
 
 
 class Origin(Base):
@@ -30,4 +35,9 @@ class Format(Base):
     target = relationship("Target", back_populates="formats")  # Back-reference to Target
 
 
-Base.metadata.create_all(engine)
+async def async_create_classes() -> None:
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+
+
+asyncio.run(async_create_classes())
