@@ -1,12 +1,12 @@
 import logging
-from backend.schemas import Format, Origin, Session
+from backend.schemas import Format, Origin, async_session
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def add_formats():
-    with Session() as session:
+    with async_session() as session:
         formats = [
             Format(name=".exe"),
             Format(name=".pdf"),
