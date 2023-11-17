@@ -3,7 +3,7 @@ import logging
 import flet as ft
 from flet_core import FilePickerResultEvent
 
-from constants import MAX_MODULE, MIN_MODULE
+from constants import MIN_MODULE
 from frontend.route_controls.general_controls import AddButton, CustomField, CustomElevatedButton
 from frontend.route_controls.service import Service
 
@@ -93,7 +93,7 @@ class OriginControl(ft.UserControl):
         self.choose_origin_button = CustomElevatedButton(text="Choose New Origin",
                                                          col=3,
                                                          on_click=self.get_origin_directory.get_directory_path_async,
-                                                         )
+                                                         icon=ft.icons.FOLDER_OPEN)
         self.add_origin_button = AddButton(col=1, on_click=self.add_origin)
         self.origin_text_field = CustomField(col=8, disabled=True, hint_text="New Origin Path")
         self.origin_data_table = ft.DataTable(col=12,

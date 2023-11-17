@@ -26,11 +26,11 @@ class AddButton(ft.IconButton):
 
 
 class CustomElevatedButton(ft.ElevatedButton):
-    def __init__(self, text, col, on_click):
+    def __init__(self, text, col, on_click, icon):
         super().__init__()
         self.text = text
         self.col = col
-        self.icon = ft.icons.FOLDER_OPEN
+        self.icon = icon
         self.height = ROW_HEIGHT
         self.on_click = on_click
         self.style = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=RADIUS))

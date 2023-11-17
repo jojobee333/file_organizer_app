@@ -59,6 +59,12 @@ class BaseRoute:
         return result.scalars().first()
 
     @staticmethod
+    async def get_by_path(session, model, path: str):
+        query = select(model).where(model.path == path)
+        result = await session.execute(query)
+        return result.scalars().first()
+
+    @staticmethod
     async def update(session, model, id, **kwargs):
         # OK
         query = select(model).where(model.id == id)

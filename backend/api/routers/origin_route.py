@@ -64,6 +64,16 @@ async def get_origin_by_id(origin_id: int):
         handle_db_session_exception(e)
 
 
+@router.get("/{origin_path}")
+async def get_origin_by_path(origin_path: str):
+    try:
+        async with async_session() as session:
+            async with session.begin():
+                return await base_route.get_by_path(session, Origin, origin_path)
+    except SQLAlchemyError as e:
+        handle_db_session_exception(e)
+
+
 @router.delete("/{origin_id:int}")
 async def delete_origin(origin_id: int):
     """Delete an origin folder from database."""
@@ -74,5 +84,3 @@ async def delete_origin(origin_id: int):
                 return {"code": 200, "message": "Origin deleted successfully"}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
-
-

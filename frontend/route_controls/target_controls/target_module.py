@@ -1,8 +1,9 @@
+import asyncio
 import logging
 import flet as ft
+import flet_core
 from flet_core import FilePickerResultEvent
-
-from constants import ROW_HEIGHT, CARD_COLOR, LARGE_SIZE, LARGE_ICON, \
+from constants import ROW_HEIGHT, CARD_COLOR, LARGE_ICON, \
     RADIUS, LARGE_TXT, SMALL_TXT, MIN_MODULE
 from frontend.route_controls.general_controls import Title, CustomField
 from frontend.route_controls.service import Service
@@ -20,7 +21,6 @@ class TargetControl(ft.UserControl):
         self.target_name_field = None
         self.all_targets = None
         self.all_formats = None
-        self.target_folder_icon = None
         self.target_grid = None
         self.get_target_directory = None
         self.section_title = None
@@ -38,37 +38,61 @@ class TargetControl(ft.UserControl):
             TargetCard(
                 color=CARD_COLOR,
                 items=[
-                    self.target_folder_icon,
+                    ft.Icon(ft.icons.FOLDER, size=LARGE_ICON, col=9),
                     ft.ResponsiveRow(controls=[self.target_name_field, self.submit_button]),
                     ft.Text(target_path, size=SMALL_TXT, no_wrap=True, max_lines=1)]))
 
     async def submit_target_card(self, e):
         """Submit the target card and add target to database."""
-        label = self.target_name_field.value
+        target_name = self.target_name_field.value
         items = self.target_grid.controls[-1].items
         path = items[-1].value
-        items.remove(self.target_grid.controls[-1].items[1])
-        items.insert(1, ft.Text(label, size=LARGE_SIZE, weight=ft.FontWeight.BOLD))
-        Service.add_target(target_label=label, target_path=path)
-        await self.update_async()
-        await self.page.update_async()
+        response = Service.add_target(target_name=target_name, target_path=path)
+        if response["code"] == 200:
+            new_target = Service.get_target_by_name(target_name)
+            for card in self.target_grid.controls:
+                if isinstance(card.items[1], flet_core.responsive_row.ResponsiveRow):
+                    self.target_grid.controls.remove(card)
+                    self.target_grid.controls.append(self.create_card(item=new_target))
+                    await self.update_async()
 
-    def populate_grid(self, item):
+    async def delete_target(self, e, target_id):
+        target_to_delete = Service.get_target_by_id(target_id)
+        response = Service.delete_target(target_id)
+        if response.status_code == 200:
+            for card in self.target_grid.controls:
+                target_name = card.items[2].value
+                if target_to_delete["name"] == target_name:
+                    self.target_grid.controls.remove(card)
+                    await self.update_async()
+
+
+    def create_card(self, item):
+        def delete_button_click(e):
+            asyncio.create_task(self.delete_target(e, item["id"]))
+
+        target_folder_icon = ft.Icon(ft.icons.FOLDER, size=LARGE_ICON, col=9)
+        overflow_button = ft.PopupMenuButton(col=3, icon=ft.icons.MORE_VERT,
+                                             items=[
+                                                 ft.PopupMenuItem(text="Delete", on_click=delete_button_click)
+                                             ])
         return TargetCard(
             color=CARD_COLOR,
             items=[
-                self.target_folder_icon,
+
+                target_folder_icon, overflow_button,
                 ft.Text(item["name"], size=LARGE_TXT, weight=ft.FontWeight.BOLD),
                 ft.Text(item["path"], size=SMALL_TXT, no_wrap=True, max_lines=1, overflow=ft.TextOverflow.FADE),
                 ft.Row(controls=[ft.Container(
                     bgcolor=ft.colors.GREY_800,
                     padding=5,
                     border_radius=ft.border_radius.all(5),
-                    content=ft.Text(fmt["name"], color="white"), col=1) for fmt in self.all_formats["results"] if fmt["target_id"] == item["id"]])
+                    content=ft.Text(fmt["name"], color="white"), col=1) for fmt in self.all_formats["results"] if
+                    fmt["target_id"] == item["id"]])
             ])
 
     def build(self):
-        all_targets = Service.get_all_targets()
+        self.all_targets = Service.get_all_targets()
         self.all_formats = Service.get_all_formats()
         self.section_title = Title(col=9, value="Destination Folders")
         self.get_target_directory = ft.FilePicker(on_result=self.get_directory_result)
@@ -80,10 +104,10 @@ class TargetControl(ft.UserControl):
                                                     on_click=self.get_target_directory.get_directory_path_async,
                                                     style=ft.ButtonStyle(
                                                         shape=ft.RoundedRectangleBorder(radius=RADIUS)))
-        self.target_folder_icon = ft.Icon(ft.icons.FOLDER, size=LARGE_ICON)
+
         self.target_grid = ft.ResponsiveRow(
             controls=[
-                self.populate_grid(item) for item in all_targets["results"]])
+                self.create_card(item) for item in self.all_targets["results"]])
 
         return ft.ResponsiveRow(
             controls=[

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import flet as ft
 
+from backend.schemas import Format
 from constants import ROW_HEIGHT, MAX_MODULE, LARGE_SIZE
 from frontend.route_controls.general_controls import Title, CustomElevatedButton
 from frontend.route_controls.service import Service
@@ -22,6 +23,8 @@ class FormatControl(ft.UserControl):
         self.all_targets = None
 
     def create_data_row(self, item):
+        logger.info(item)
+
         def delete_button_click(e):
             asyncio.create_task(self.delete_format(e, item["id"]))
 
@@ -29,11 +32,18 @@ class FormatControl(ft.UserControl):
                                       icon=ft.icons.DELETE,
                                       on_click=delete_button_click
                                       )
+
+        target = Service.get_target_by_id(item["target_id"])
+        # if target id exists, then associate target name with third data cell, else leave empty
+        if target:
+            target_name = target["name"]
+        else:
+            target_name = ""
         return ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(item["id"], col=2)),
                 ft.DataCell(ft.Text(item["name"], col=3, weight=ft.FontWeight.BOLD)),
-                ft.DataCell(ft.Text(Service.get_target_by_id(item['target_id'])["name"], col=4)),
+                ft.DataCell(ft.Text(target_name, col=4)),
                 ft.DataCell(delete_button)
 
             ]
@@ -44,7 +54,6 @@ class FormatControl(ft.UserControl):
         try:
             response = Service.delete_format(format_id)
             if response.status_code == 200:
-                logger.info("True")
                 for row in self.format_data_table.rows:
                     if row.cells[0].content.value == format_id:
                         self.format_data_table.rows = [
@@ -113,7 +122,7 @@ class FormatControl(ft.UserControl):
                 ft.DataColumn(ft.Text("Delete"))],
 
             rows=[self.create_data_row(item=item) for item in self.all_formats["results"]])
-        self.new_format_button = CustomElevatedButton(text="New Format", col=3, on_click=self.new_format_card)
+        self.new_format_button = CustomElevatedButton(text="New Format", col=3, on_click=self.new_format_card, icon=ft.icons.FOLDER_OPEN)
         return ft.Column(
             scroll=ft.ScrollMode.ADAPTIVE,
             height=MAX_MODULE,
