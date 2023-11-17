@@ -38,7 +38,7 @@ async def add_new_format(name: str, target_id):
         handle_db_session_exception(e)
 
 
-@router.get("/{format_id}")
+@router.get("/{format_id:int}")
 async def get_format_by_id(format_id: int):
     """Gets a format from the database."""
     # OK
@@ -50,7 +50,17 @@ async def get_format_by_id(format_id: int):
         handle_db_session_exception(e)
 
 
-@router.patch("/{format_id}")
+@router.get("/{format_name}")
+async def get_format_by_name(format_name: str):
+    try:
+        async with async_session() as session:
+            async with session.begin():
+                return await base_route.get_by_name(session=session, model=Format, name=format_name)
+    except SQLAlchemyError as e:
+        handle_db_session_exception(e)
+
+
+@router.patch("/{format_id:int}")
 async def update_format(format_id: int, name=None, target_id=None):
     # OK
     try:
@@ -69,13 +79,14 @@ async def update_format(format_id: int, name=None, target_id=None):
         handle_db_session_exception(e)
 
 
-@router.delete("/{format_id}")
+@router.delete("/{format_id:int}")
 async def delete_format(format_id: int):
     """Delete a format from database."""
     # OK
     try:
-        with async_session() as session:
-            await base_route.delete(session, Format, format_id)
-            return {"code": 200, "message": "Format deleted successfully"}
+        async with async_session() as session:
+            async with session.begin():
+                await base_route.delete(session, Format, format_id)
+                return {"code": 200, "message": "Format deleted successfully"}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)

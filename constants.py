@@ -1,7 +1,20 @@
+import flet as ft
+
+
 HOST = "127.0.0.1"
 PORT = 8000
 url_base = f"http://{HOST}:{PORT}"
 DATABASE_URL = "sqlite+aiosqlite:///mydatabase.db"
 HEADERS = {'Content-Type': 'application/json'}
-SIZE = 15
-HEIGHT = 40
+SMALL_TXT = 10
+LARGE_TXT = 15
+ROW_HEIGHT = 40
+MIN_MODULE = 220
+MAX_MODULE = 300
+MAX_EXTENT = 220
+SMALL_PADDING = 5
+RADIUS = 5
+LARGE_PADDING = 10
+LARGE_ICON = 100
+LARGE_SIZE = 15
+CARD_COLOR = ft.colors.GREY_900
