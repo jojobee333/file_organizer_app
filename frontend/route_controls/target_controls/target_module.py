@@ -2,7 +2,7 @@ import logging
 import flet as ft
 from flet_core import FilePickerResultEvent
 
-from constants import ROW_HEIGHT, CARD_COLOR, LARGE_SIZE, MAX_MODULE, LARGE_ICON, \
+from constants import ROW_HEIGHT, CARD_COLOR, LARGE_SIZE, LARGE_ICON, \
     RADIUS, LARGE_TXT, SMALL_TXT, MIN_MODULE
 from frontend.route_controls.general_controls import Title, CustomField
 from frontend.route_controls.service import Service
@@ -19,6 +19,7 @@ class TargetControl(ft.UserControl):
         super().__init__()
         self.target_name_field = None
         self.all_targets = None
+        self.all_formats = None
         self.target_folder_icon = None
         self.target_grid = None
         self.get_target_directory = None
@@ -50,6 +51,7 @@ class TargetControl(ft.UserControl):
         items.insert(1, ft.Text(label, size=LARGE_SIZE, weight=ft.FontWeight.BOLD))
         Service.add_target(target_label=label, target_path=path)
         await self.update_async()
+        await self.page.update_async()
 
     def populate_grid(self, item):
         return TargetCard(
@@ -57,11 +59,17 @@ class TargetControl(ft.UserControl):
             items=[
                 self.target_folder_icon,
                 ft.Text(item["name"], size=LARGE_TXT, weight=ft.FontWeight.BOLD),
-                ft.Text(item["path"], size=SMALL_TXT, no_wrap=True, max_lines=1, overflow=ft.TextOverflow.FADE)
+                ft.Text(item["path"], size=SMALL_TXT, no_wrap=True, max_lines=1, overflow=ft.TextOverflow.FADE),
+                ft.Row(controls=[ft.Container(
+                    bgcolor=ft.colors.GREY_800,
+                    padding=5,
+                    border_radius=ft.border_radius.all(5),
+                    content=ft.Text(fmt["name"], color="white"), col=1) for fmt in self.all_formats["results"] if fmt["target_id"] == item["id"]])
             ])
 
     def build(self):
         all_targets = Service.get_all_targets()
+        self.all_formats = Service.get_all_formats()
         self.section_title = Title(col=9, value="Destination Folders")
         self.get_target_directory = ft.FilePicker(on_result=self.get_directory_result)
         self.target_name_field = CustomField(col=8, hint_text="Add Label", disabled=False)

@@ -104,7 +104,6 @@ class FormatControl(ft.UserControl):
         self.format_name_field = ft.TextField(col=3, hint_text=".exe", disabled=False,
                                               border_radius=ft.border_radius.all(5),
                                               height=ROW_HEIGHT, text_size=LARGE_SIZE)
-
         self.format_data_table = ft.DataTable(
             col=12,
             columns=[
@@ -114,7 +113,6 @@ class FormatControl(ft.UserControl):
                 ft.DataColumn(ft.Text("Delete"))],
 
             rows=[self.create_data_row(item=item) for item in self.all_formats["results"]])
-
         self.new_format_button = CustomElevatedButton(text="New Format", col=3, on_click=self.new_format_card)
         return ft.Column(
             scroll=ft.ScrollMode.ADAPTIVE,
