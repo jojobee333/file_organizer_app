@@ -5,7 +5,7 @@ import flet_core
 from flet_core import FilePickerResultEvent
 from constants import ROW_HEIGHT, CARD_COLOR, LARGE_ICON, \
     RADIUS, LARGE_TXT, SMALL_TXT, MIN_MODULE
-from frontend.route_controls.general_controls import Title, CustomField
+from frontend.route_controls.base_controls import Title, CustomField
 from frontend.route_controls.service import Service
 from frontend.route_controls.target_controls.custom_target_card import TargetCard
 
@@ -65,7 +65,6 @@ class TargetControl(ft.UserControl):
                 if target_to_delete["name"] == target_name:
                     self.target_grid.controls.remove(card)
                     await self.update_async()
-
 
     def create_card(self, item):
         def delete_button_click(e):

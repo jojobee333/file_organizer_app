@@ -2,7 +2,7 @@ import flet as ft
 from flet_core import IconButton, ElevatedButton, Dropdown
 
 from constants import ROW_HEIGHT, LARGE_SIZE
-from frontend.route_controls.general_controls import CustomField
+from frontend.route_controls.base_controls import CustomField
 from frontend.route_controls.service import Service
 
 

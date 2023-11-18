@@ -4,7 +4,7 @@ import flet as ft
 from flet_core import FilePickerResultEvent
 
 from constants import MIN_MODULE
-from frontend.route_controls.general_controls import AddButton, CustomField, CustomElevatedButton
+from frontend.route_controls.base_controls import AddButton, CustomField, CustomElevatedButton
 from frontend.route_controls.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
@@ -97,16 +97,16 @@ class OriginControl(ft.UserControl):
         self.add_origin_button = AddButton(col=1, on_click=self.add_origin)
         self.origin_text_field = CustomField(col=8, disabled=True, hint_text="New Origin Path")
         self.origin_data_table = ft.DataTable(col=12,
-            show_checkbox_column=True,
-            columns=[
-                ft.DataColumn(ft.Text("id", col=2)),
-                ft.DataColumn(ft.Text("Path", col=6)),
-                ft.DataColumn(ft.Text("Delete", col=3))
-            ],
-            rows=[
-                self.create_data_row(item) for item in all_origins["results"]
-            ]
-        )
+                                              show_checkbox_column=True,
+                                              columns=[
+                                                  ft.DataColumn(ft.Text("id", col=2)),
+                                                  ft.DataColumn(ft.Text("Path", col=6)),
+                                                  ft.DataColumn(ft.Text("Delete", col=3))
+                                              ],
+                                              rows=[
+                                                  self.create_data_row(item) for item in all_origins["results"]
+                                              ]
+                                              )
         return ft.ResponsiveRow(
             controls=[
                 self.origin_text_field,
