@@ -74,7 +74,6 @@ class FormatControl(ft.UserControl):
 
     async def submit_format_row(self, e):
         """Submits the format to database, finalizes the row"""
-        # working
         try:
             if not self.format_name_field or not self.target_dropdown.value:
                 raise InvalidEntryException("Format is Invalid.")
