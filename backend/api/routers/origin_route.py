@@ -39,7 +39,7 @@ async def add_new_origin(path: str):
         handle_db_session_exception(e)
 
 
-@router.get("/{origin_id}/items")
+@router.get("/{origin_id:int}/items")
 async def get_folder_items(origin_id: int):
     """Retrieves all items from a specified folder based on id."""
     # OK
@@ -52,7 +52,7 @@ async def get_folder_items(origin_id: int):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/{origin_id}")
+@router.get("/{origin_id:int}")
 async def get_origin_by_id(origin_id: int):
     """Gets an origin folder from the database."""
     # OK
@@ -64,7 +64,17 @@ async def get_origin_by_id(origin_id: int):
         handle_db_session_exception(e)
 
 
-@router.delete("/{origin_id}")
+@router.get("/{origin_path}")
+async def get_origin_by_path(origin_path: str):
+    try:
+        async with async_session() as session:
+            async with session.begin():
+                return await base_route.get_by_path(session, Origin, origin_path)
+    except SQLAlchemyError as e:
+        handle_db_session_exception(e)
+
+
+@router.delete("/{origin_id:int}")
 async def delete_origin(origin_id: int):
     """Delete an origin folder from database."""
     try:
@@ -74,5 +84,3 @@ async def delete_origin(origin_id: int):
                 return {"code": 200, "message": "Origin deleted successfully"}
     except SQLAlchemyError as e:
         handle_db_session_exception(e)
-
-

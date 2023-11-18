@@ -40,4 +40,4 @@ async def async_create_classes() -> None:
         await connection.run_sync(Base.metadata.create_all)
 
 
-asyncio.run(async_create_classes())
+

@@ -38,7 +38,7 @@ async def add_new_target(name: str, path: str):
         handle_db_session_exception(e)
 
 
-@router.get("/{origin_id}/items")
+@router.get("/{target_id:int}/items")
 async def get_folder_items(target_id: int):
     """Retrieves all items from a specified folder based on id."""
     # OK
@@ -52,7 +52,7 @@ async def get_folder_items(target_id: int):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/{target_id}")
+@router.get("/{target_id:int}")
 async def get_target_by_id(target_id: int):
     """Gets a target from the database."""
     # OK
@@ -64,7 +64,17 @@ async def get_target_by_id(target_id: int):
         handle_db_session_exception(e)
 
 
-@router.patch("/{target_id}")
+@router.get("/{target_name}")
+async def get_target_by_name(target_name: str):
+    try:
+        async with async_session() as session:
+            async with session.begin():
+                return await base_route.get_by_name(session=session, model=Target, name=target_name)
+    except SQLAlchemyError as e:
+        handle_db_session_exception(e)
+
+
+@router.patch("/{target_id:int}")
 async def update_target(target_id: int, name=None, path=None):
     # OK
     try:
@@ -81,7 +91,7 @@ async def update_target(target_id: int, name=None, path=None):
         handle_db_session_exception(e)
 
 
-@router.delete("/{target_id}")
+@router.delete("/{target_id:int}")
 async def delete_target(target_id: int):
     """Delete a target folder from database."""
     try:

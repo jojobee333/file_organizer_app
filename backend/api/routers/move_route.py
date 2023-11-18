@@ -18,16 +18,17 @@ router = APIRouter(tags=["Move"], prefix="/move")
 async def move_files(origin_id: int, origin_path: str):
     files_moved = 0
     try:
-        formats = await get_all_formats()
+        query = await get_all_formats()
+        formats = query["results"]
         folder_items = await get_folder_items(origin_id)
+        message = []
 
         # Asynchronously populate format_destinations
         format_destinations = {}
         for fmt in formats:
+            logger.info(fmt)
             target = await get_target_by_id(fmt.target_id)
             format_destinations[fmt.name] = target.path if target else ""
-
-        logging.info(format_destinations)
 
         for item in folder_items:
             suffix = os.path.splitext(item)[-1]
@@ -36,18 +37,24 @@ async def move_files(origin_id: int, origin_path: str):
             if destination:
                 source = os.path.join(origin_path, item)
                 if not os.path.exists(source):
-                    logger.warning(f"Source file does not exist: {source}.")
+                    alert = f"Source file does not exist: {source}."
+                    message.append(alert)
+                    logger.warning(alert)
                     continue
                 destination_path = os.path.join(destination, item)
-                logger.info(f"Moving '{item}' to '{destination}'")
+                destination_alert = f"Moving '{item}' to '{destination}'"
+                logger.info(destination_alert)
                 # Could potentially be a bottleneck in performance.
                 shutil.move(source, destination_path)
                 files_moved += 1
             else:
-                logger.warning(f"Unmapped extension found: {suffix}")
+                warning_alert = f"Unmapped extension found: {suffix}"
+                message.append(warning_alert)
+                logger.warning(warning_alert)
 
-        message = f"Operation complete. {files_moved}/{len(folder_items)} files moved."
-        logger.info(message)
+        final_message = f"Operation complete. {files_moved}/{len(folder_items)} files moved."
+        message.append(final_message)
+        logger.info(final_message)
         return {"message": message}
 
     except Exception as e:
