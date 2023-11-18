@@ -4,7 +4,6 @@ import threading
 import flet as ft
 from backend.api.main import start_backend
 from constants import MAX_MODULE, ROW_HEIGHT, LARGE_SIZE
-from frontend.route_controls.alert_handler import AlertHandler
 from frontend.route_controls.format_controls.format_module import FormatControl
 from frontend.route_controls.base_controls import CustomElevatedButton
 from frontend.route_controls.origin_controls.origin_module import OriginControl
