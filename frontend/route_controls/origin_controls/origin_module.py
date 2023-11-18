@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 class OriginControl(ft.UserControl):
     # OK
-    def __init__(self):
+    def __init__(self, all_origins):
         super().__init__()
+        self.all_origins = all_origins
         self.origin_text_field = None
         self.origin_data_table = None
         self.add_origin_button = None
         self.choose_origin_button = None
         self.get_origin_directory = None
-        self.all_origins = None
 
     async def add_origin(self, e):
         # OK
@@ -88,7 +88,6 @@ class OriginControl(ft.UserControl):
             logger.error(e)
 
     def build(self):
-        all_origins = Service.get_all_origins()
         self.get_origin_directory = ft.FilePicker(on_result=self.get_directory_result)
         self.choose_origin_button = CustomElevatedButton(text="Choose New Origin",
                                                          col=3,
@@ -104,7 +103,7 @@ class OriginControl(ft.UserControl):
                                                   ft.DataColumn(ft.Text("Delete", col=3))
                                               ],
                                               rows=[
-                                                  self.create_data_row(item) for item in all_origins["results"]
+                                                  self.create_data_row(item) for item in self.all_origins["results"]
                                               ]
                                               )
         return ft.ResponsiveRow(

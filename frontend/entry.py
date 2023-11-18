@@ -4,6 +4,7 @@ import threading
 import flet as ft
 from backend.api.main import start_backend
 from constants import MAX_MODULE, ROW_HEIGHT, LARGE_SIZE
+from frontend.route_controls.alert_handler import AlertHandler
 from frontend.route_controls.format_controls.format_module import FormatControl
 from frontend.route_controls.base_controls import CustomElevatedButton
 from frontend.route_controls.origin_controls.origin_module import OriginControl
@@ -53,6 +54,10 @@ async def main(page: ft.Page):
         except Exception as e:
             logger.info(e)
 
+    all_origins = Service.get_all_origins()
+    all_formats = Service.get_all_formats()
+    all_targets = Service.get_all_targets()
+
     refresh_button = CustomElevatedButton(col=12, icon=ft.icons.REFRESH, text="Refresh", on_click=load)
     move_button = CustomElevatedButton(col=12, icon=ft.icons.PLAY_ARROW, text="Move", on_click=move)
     select_origin = ft.Dropdown(col=12,
@@ -61,7 +66,7 @@ async def main(page: ft.Page):
                                 text_size=LARGE_SIZE,
                                 options=[
                                     ft.dropdown.Option(f"{item['path']}") for item in
-                                    Service.get_all_origins()["results"]
+                                    all_origins["results"]
 
                                 ])
     loading_screen = ft.Column(col=9,
@@ -70,7 +75,12 @@ async def main(page: ft.Page):
                                controls=[
                                    ft.SafeArea(height=MAX_MODULE, content=ft.Text("")),
                                    ft.ProgressRing(width=ROW_HEIGHT, height=ROW_HEIGHT, value=1.0)])
-    main_screen = ft.Column(col=9, controls=[OriginControl(), TargetControl(), FormatControl()])
+    main_screen = ft.Column(col=9, controls=[OriginControl(all_origins=all_origins),
+                                             TargetControl(all_formats=all_formats,
+                                                           all_targets=all_targets,
+                                                           ),
+                                             FormatControl(all_formats=all_formats,
+                                                           all_targets=all_targets)])
     main_layout = ft.ResponsiveRow(controls=[
         ft.Container(col=3,
                      border=ft.border.only(right=ft.border.BorderSide(1, ft.colors.WHITE)),
