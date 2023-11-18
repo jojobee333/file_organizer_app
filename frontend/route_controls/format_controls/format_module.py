@@ -49,7 +49,6 @@ class FormatControl(ft.UserControl):
 
     async def delete_format_card(self, e, format_id):
         """Deletes format from database and deletes the row."""
-        # OK
         try:
             response = Service.delete_format(format_id)
             if response.status_code == 200:
