@@ -1,7 +1,7 @@
-[Your App Name]: File Organizer
-Overview
+#File Organizer Application
+###Overview
 
-[Your App Name] is an advanced file organizer designed to streamline the management of your digital files. Built with an intuitive Flet GUI, this application allows users to efficiently sort and organize files into designated folders based on file formats.
+File Organizer is an advanced file organizer designed to streamline the management of your digital files. Built with an intuitive Flet GUI, this application allows users to efficiently sort and organize files into designated folders based on file formats.
 Features
 
     Multiple Folder Management: Easily manage multiple source folders from a single interface.
@@ -22,13 +22,13 @@ How to Use
 
 Installation
 
-[Instructions on how to install the application, including any prerequisites.]
+[WIP - Adding Additional Features]
 Contributing
 
-This project is a work in progress, and contributions are welcome. If you're interested in improving [Your App Name], please feel free to fork the repository and submit a pull request.
+This project is a work in progress, and contributions are not welcome at this time
 License
 
-[Information about the licensing of your app, if applicable.]
-Contact
+## License
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-For any queries or suggestions, feel free to reach out at [Your Contact Information].
+
