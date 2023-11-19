@@ -12,7 +12,7 @@ Features
 
 Demo
 
-[Demo GIF](https://github.com/jojobee333/file_organizer_app/blob/master/frontend/assets/file_organizer_demo.gif)
+![](https://github.com/jojobee333/file_organizer_app/blob/master/frontend/assets/file_organizer_demo.gif)
 How to Use
 
     Set Source Folders: Select the folders you want to organize.
