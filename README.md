@@ -25,7 +25,6 @@ How to Use
 [WIP - Adding Additional Features]
 ## Contributing
 
-This project is a work in progress, and contributions are not welcome at this time
 License
 
 ## License
