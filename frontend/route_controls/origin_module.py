@@ -4,7 +4,7 @@ import flet as ft
 from flet_core import FilePickerResultEvent
 
 from constants import MIN_MODULE
-from frontend.route_controls.base_controls import AddButton, CustomField, CustomElevatedButton
+from frontend.route_controls.custom_controls import AddButton, CustomField, CustomElevatedButton
 from frontend.service.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")

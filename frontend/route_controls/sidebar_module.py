@@ -6,7 +6,7 @@ from flet_core import ElevatedButton
 
 from constants import ROW_HEIGHT, LARGE_SIZE, LOGO_SIZE, TITLE_SIZE, PAGE_HEIGHT
 from frontend.route_controls.alert_controls.alert_handler import AlertHandler
-from frontend.route_controls.base_controls import CustomElevatedButton
+from frontend.route_controls.custom_controls import CustomElevatedButton
 from frontend.exceptions.custom_exceptions import InvalidEntryException
 from frontend.service.service import Service
 

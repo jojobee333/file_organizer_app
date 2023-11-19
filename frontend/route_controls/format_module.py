@@ -1,10 +1,10 @@
 import asyncio
 import logging
 import flet as ft
-from constants import ROW_HEIGHT, MAX_MODULE, LARGE_SIZE
+from constants import ROW_HEIGHT, MAX_MODULE, LARGE_SIZE, MIN_MODULE
 from frontend.exceptions.custom_exceptions import InvalidEntryException
 from frontend.route_controls.alert_controls.alert_handler import AlertHandler
-from frontend.route_controls.base_controls import Title, CustomElevatedButton, CustomField
+from frontend.route_controls.custom_controls import Title, CustomElevatedButton, CustomField
 from frontend.service.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
@@ -156,8 +156,8 @@ class FormatControl(ft.UserControl):
         self.new_format_button = CustomElevatedButton(text="New Format", col=3, on_click=self.format_row_draft,
                                                       icon=ft.icons.FOLDER_OPEN)
         return ft.Column(
-            scroll=ft.ScrollMode.ADAPTIVE,
-            height=MAX_MODULE,
+            scroll=ft.ScrollMode.ALWAYS,
+            height=MIN_MODULE,
             col=12,
             controls=[
                 ft.ResponsiveRow(col=12, controls=[self.section_title,

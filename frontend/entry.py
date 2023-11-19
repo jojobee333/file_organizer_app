@@ -5,7 +5,7 @@ import flet as ft
 from backend.api.main import start_backend
 from constants import MAX_MODULE, ROW_HEIGHT
 from frontend.route_controls.format_module import FormatControl
-from frontend.route_controls.base_controls import CustomElevatedButton
+from frontend.route_controls.custom_controls import CustomElevatedButton
 from frontend.route_controls.origin_module import OriginControl
 from frontend.route_controls.sidebar_module import SideBar
 from frontend.route_controls.target_module import TargetControl
@@ -34,7 +34,7 @@ class BaseControl(ft.UserControl):
         logger.info(self.main_layout.controls)
         for i in range(0, 101):
             self.loading_screen.controls[-1].value = i * 0.01
-            await asyncio.sleep(0.001)
+            await asyncio.sleep(0.01)
             await self.update_async()
         await self.reload_main(e)
 
