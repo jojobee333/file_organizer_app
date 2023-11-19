@@ -8,8 +8,7 @@ from constants import ROW_HEIGHT, CARD_COLOR, LARGE_ICON, \
 from frontend.exceptions.custom_exceptions import InvalidEntryException
 from frontend.route_controls.alert_controls.alert_handler import AlertHandler
 from frontend.route_controls.base_controls import Title, CustomField, TargetCard
-from frontend.service import Service
-
+from frontend.service.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)

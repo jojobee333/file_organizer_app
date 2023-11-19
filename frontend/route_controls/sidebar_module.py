@@ -4,11 +4,11 @@ import logging
 import flet as ft
 from flet_core import ElevatedButton
 
-from constants import ROW_HEIGHT, LARGE_SIZE
+from constants import ROW_HEIGHT, LARGE_SIZE, LOGO_SIZE, TITLE_SIZE, PAGE_HEIGHT
 from frontend.route_controls.alert_controls.alert_handler import AlertHandler
 from frontend.route_controls.base_controls import CustomElevatedButton
 from frontend.exceptions.custom_exceptions import InvalidEntryException
-from frontend.service import Service
+from frontend.service.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,6 +18,8 @@ class SideBar(ft.UserControl):
     def __init__(self, col,
                  refresh_button: ElevatedButton):
         super().__init__()
+        self.height = PAGE_HEIGHT
+        self.app_name = None
         self.select_origin = None
         self.col = col
         self.refresh_button = refresh_button
@@ -49,6 +51,8 @@ class SideBar(ft.UserControl):
             await self.alert_handler(title="Invalid Origin", message="The origin path is not valid.")
 
     def build(self):
+        self.app_name = ft.Text("File Manager", size=TITLE_SIZE,
+                                weight=ft.FontWeight.BOLD, col=12, text_align=ft.TextAlign.CENTER)
         self.move_button = CustomElevatedButton(col=12, icon=ft.icons.PLAY_ARROW, text="Move", on_click=self.move)
         self.select_origin = ft.Dropdown(col=12,
                                          height=ROW_HEIGHT,
@@ -60,7 +64,9 @@ class SideBar(ft.UserControl):
                                          ])
 
         self.logo = ft.Image(
-            src="/frontend/assets/file_logo.png"
+            height=LOGO_SIZE,
+            width=LOGO_SIZE,
+            src="file_logo.png"
         )
 
         return ft.Container(
@@ -68,6 +74,7 @@ class SideBar(ft.UserControl):
             col=self.col,
             content=ft.ResponsiveRow(
                 controls=[
+                    self.app_name,
                     self.logo,
                     self.refresh_button,
                     self.select_origin,

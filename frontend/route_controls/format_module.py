@@ -5,7 +5,7 @@ from constants import ROW_HEIGHT, MAX_MODULE, LARGE_SIZE
 from frontend.exceptions.custom_exceptions import InvalidEntryException
 from frontend.route_controls.alert_controls.alert_handler import AlertHandler
 from frontend.route_controls.base_controls import Title, CustomElevatedButton, CustomField
-from frontend.service import Service
+from frontend.service.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
