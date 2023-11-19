@@ -23,7 +23,7 @@ How to Use
 ## Installation
 
 [WIP - Adding Additional Features]
-Contributing
+## Contributing
 
 This project is a work in progress, and contributions are not welcome at this time
 License
