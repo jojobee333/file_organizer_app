@@ -5,7 +5,7 @@ from flet_core import FilePickerResultEvent
 
 from constants import MIN_MODULE
 from frontend.route_controls.base_controls import AddButton, CustomField, CustomElevatedButton
-from frontend.route_controls.service import Service
+from frontend.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 class OriginControl(ft.UserControl):
     # OK
-    def __init__(self, all_origins):
+    def __init__(self):
         super().__init__()
-        self.all_origins = all_origins
         self.origin_text_field = None
         self.origin_data_table = None
         self.add_origin_button = None
         self.choose_origin_button = None
         self.get_origin_directory = None
+        self.all_origins = Service.get_all_origins()
 
     async def add_origin(self, e):
         # OK

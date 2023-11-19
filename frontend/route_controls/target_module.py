@@ -5,11 +5,11 @@ import flet_core
 from flet_core import FilePickerResultEvent
 from constants import ROW_HEIGHT, CARD_COLOR, LARGE_ICON, \
     RADIUS, LARGE_TXT, SMALL_TXT, MIN_MODULE
-from frontend.route_controls.alert_handler import AlertHandler
-from frontend.route_controls.base_controls import Title, CustomField
-from frontend.route_controls.exception_controls.custom_exceptions import InvalidEntryException
-from frontend.route_controls.service import Service
-from frontend.route_controls.target_controls.custom_target_card import TargetCard
+from frontend.exceptions.custom_exceptions import InvalidEntryException
+from frontend.route_controls.alert_controls.alert_handler import AlertHandler
+from frontend.route_controls.base_controls import Title, CustomField, TargetCard
+from frontend.service import Service
+
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,19 +18,16 @@ logger = logging.getLogger(__name__)
 class TargetControl(ft.UserControl):
     # OK
 
-    def __init__(self, all_targets, all_formats):
+    def __init__(self):
         super().__init__()
         self.target_name_field = None
-        self.all_targets = all_targets
-        self.all_formats = all_formats
         self.target_grid = None
         self.get_target_directory = None
         self.section_title = None
         self.choose_dest_button = None
         self.submit_button = None
-
-    def check_length(self):
-        logger.info(self.target_grid.controls[-1])
+        self.all_targets = Service.get_all_targets()
+        self.all_formats = Service.get_all_formats()
 
     async def alert_handler(self):
         async def close_button_click(e):
@@ -42,16 +39,12 @@ class TargetControl(ft.UserControl):
         await AlertHandler.open_alert(self.page, alert)
 
     async def get_directory_result(self, e: FilePickerResultEvent):
-        try:
-            target_path = e.path if e.path else ""
-            if target_path:
-                self.new_destination_card(target_path)
-            await self.update_async()
-        except Exception as e:
-            logger.error(e)
+        target_path = e.path if e.path else ""
+        if target_path:
+            self.new_destination_card(target_path)
+        await self.update_async()
 
     def new_destination_card(self, target_path):
-        self.check_length()
         try:
             self.target_grid.controls.append(
                 TargetCard(

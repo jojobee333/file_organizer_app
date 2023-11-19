@@ -2,31 +2,31 @@ import asyncio
 import logging
 import flet as ft
 from constants import ROW_HEIGHT, MAX_MODULE, LARGE_SIZE
-from frontend.route_controls.alert_handler import AlertHandler
-from frontend.route_controls.exception_controls.custom_exceptions import InvalidEntryException
+from frontend.exceptions.custom_exceptions import InvalidEntryException
+from frontend.route_controls.alert_controls.alert_handler import AlertHandler
 from frontend.route_controls.base_controls import Title, CustomElevatedButton, CustomField
-from frontend.route_controls.service import Service
+from frontend.service import Service
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class FormatControl(ft.UserControl):
-    def __init__(self, all_formats, all_targets):
+    def __init__(self):
         super().__init__()
-        self.all_formats = all_formats
-        self.all_targets = all_targets
         self.section_title = None
         self.alert_handler = None
         self.format_data_table = None
         self.format_name_field = None
         self.new_format_button = None
         self.target_dropdown = None
+        self.all_formats = Service.get_all_formats()
+        self.all_targets = Service.get_all_targets()
 
     def create_data_row(self, item):
         try:
             def delete_button_click(e):
-                asyncio.create_task(self.delete_format_card(e, item["id"]))
+                asyncio.create_task(self.delete_format_row(e, item["id"]))
 
             delete_button = ft.IconButton(col=2,
                                           icon=ft.icons.DELETE,
@@ -47,7 +47,7 @@ class FormatControl(ft.UserControl):
         except Exception as e:
             logger.info(e)
 
-    async def delete_format_card(self, e, format_id):
+    async def delete_format_row(self, e, format_id):
         """Deletes format from database and deletes the row."""
         try:
             response = Service.delete_format(format_id)
@@ -72,19 +72,23 @@ class FormatControl(ft.UserControl):
             return False
         return True
 
+    @staticmethod
+    def add_format(format_name, target_name):
+        target_id = Service.get_target_by_name(target_name)["id"]
+        return Service.add_format(format_name=format_name, target_id=int(target_id))
+
     async def submit_format_row(self, e):
         """Submits the format to database, finalizes the row"""
         try:
             if not self.format_name_field or not self.target_dropdown.value:
                 raise InvalidEntryException("Format is Invalid.")
 
-            if self.format_name_field.value and self.target_dropdown.value:
-                if not FormatControl.validate_format_name(self.format_name_field.value):
-
+            elif self.format_name_field.value and self.target_dropdown.value:
+                if FormatControl.validate_format_name(self.format_name_field.value):
                     format_name = self.format_name_field.value
-                    target_id = Service.get_target_by_name(self.target_dropdown.value)["id"]
-                    response = Service.add_format(format_name=format_name, target_id=int(target_id))
-
+                    response = FormatControl().add_format(format_name=format_name,
+                                                          target_name=self.target_dropdown.value)
+                    logger.info(response)
                     if response["code"] == 200:
                         new_format = Service.get_format_by_name(format_name)
                         for row in self.format_data_table.rows:
