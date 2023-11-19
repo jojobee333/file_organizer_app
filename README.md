@@ -1,5 +1,5 @@
-#File Organizer Application
-###Overview
+# File Organizer Application
+## Overview
 
 File Organizer is an advanced file organizer designed to streamline the management of your digital files. Built with an intuitive Flet GUI, this application allows users to efficiently sort and organize files into designated folders based on file formats.
 Features
@@ -10,7 +10,7 @@ Features
     Dynamic Format Assignment: Flexibly assign various formats to desired folders as needed.
     [Upcoming Feature] Enhanced Security: Future updates will include robust security features to ensure the safety of your files.
 
-Demo
+## Demo
 
 ![](https://github.com/jojobee333/file_organizer_app/blob/master/frontend/assets/file_organizer_demo.gif)
 How to Use
@@ -20,7 +20,7 @@ How to Use
     Name Your Folders: Designate key names for each target folder for easy recognition.
     Run the Organizer: With a single click, let the app sort and send files to the respective folders.
 
-Installation
+## Installation
 
 [WIP - Adding Additional Features]
 Contributing
