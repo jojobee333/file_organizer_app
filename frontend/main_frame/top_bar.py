@@ -6,7 +6,7 @@ from backend.service import Service
 from constants import MIN_MODULE, ROW_HEIGHT
 from frontend.components.components import (Selector, ThemedField, SecondaryContainer,
                                             primary_border_color, AlertField, AlertBox, Title, Tag, OKButton)
-from frontend.screens.alert_handler import AlertHandler
+from frontend.control_handlers.alert_handler import AlertHandler
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")

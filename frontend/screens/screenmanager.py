@@ -2,7 +2,6 @@ import asyncio
 import logging
 import flet as ft
 
-from backend.service import Service
 from constants import MAX_HEIGHT
 from frontend.components.components import NavButton
 from frontend.main_frame.top_bar import TopBar
@@ -20,6 +19,9 @@ class ScreenManager(ft.UserControl):
 
     def __init__(self):
         super().__init__()
+        self.all_targets = None
+        self.all_origins = None
+        self.all_formats = None
         self.default_value = None
         self.refresh_button = None
         self.screen_manager_main = None
@@ -38,7 +40,7 @@ class ScreenManager(ft.UserControl):
             elif screen_type == "folder":
                 return FolderScreen(self.default_value)
             elif screen_type == "format":
-                return FormatScreen(self.default_value)
+                return FormatScreen(col=self.default_value)
             elif screen_type == "loading":
                 return LoadingScreen()
             else:

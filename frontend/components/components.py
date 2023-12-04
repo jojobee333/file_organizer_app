@@ -62,6 +62,18 @@ class NavButton(ft.TextButton):
         self.on_click = on_click
 
 
+class AddButton(ft.IconButton):
+    def __init__(self, on_click, col=2):
+        super().__init__()
+        self.col = col
+        self.on_click = on_click
+        self.icon = ft.icons.ADD
+        self.icon_size = 20
+        self.height = ROW_HEIGHT
+        self.style = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5))
+
+
+
 class Selector(ft.Dropdown):
     def __init__(self, hint_text: str, options: list, col: int):
         super().__init__()
@@ -248,10 +260,8 @@ class SingleItemLogRow(ft.Container):
             ft.Text(str(files_moved), col=6),
             ft.Text(date, col=1)
         ])
-
-
 class SingleItemFileRow(ft.Container):
-    def __init__(self, name: str, location: str):
+    def __init__(self, name: str, location: str, on_click=None):
         super().__init__()
         self.col = 12
         self.padding = SMALL_PADDING
@@ -259,8 +269,23 @@ class SingleItemFileRow(ft.Container):
         self.border_radius = ft.border_radius.all(RADIUS)
         self.content = ft.ResponsiveRow(controls=[
             ft.Icon(ft.icons.CIRCLE, col=1),
-            ft.Text(name, col=8),
-            ft.Text(location, col=3)
+            ft.Text(name, col=7),
+            ft.Text(location, col=4)
+        ])
+
+
+class SingleItemFormatRow(ft.Container):
+    def __init__(self, name: str, location: str, on_click=None):
+        super().__init__()
+        self.col = 12
+        self.padding = SMALL_PADDING
+        self.bgcolor = tertiary_color
+        self.border_radius = ft.border_radius.all(RADIUS)
+        self.content = ft.ResponsiveRow(controls=[
+            ft.Icon(ft.icons.CIRCLE, col=1),
+            ft.Text(name, col=7),
+            ft.Text(location, col=3),
+            ft.IconButton(ft.icons.DELETE, on_click=on_click, col=1, height=20, icon_size=15)
         ])
 
 
