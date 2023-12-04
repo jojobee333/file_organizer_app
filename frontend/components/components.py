@@ -73,7 +73,6 @@ class AddButton(ft.IconButton):
         self.style = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5))
 
 
-
 class Selector(ft.Dropdown):
     def __init__(self, hint_text: str, options: list, col: int):
         super().__init__()
@@ -145,7 +144,8 @@ class PropertyColumn(ft.Container):
 
 
 class AlertField(ft.TextField):
-    def __init__(self, col, disabled, value=None, hint_text=None, label=None, prefix=None, height=40, text_size=TEXT_SIZE):
+    def __init__(self, col, disabled, value=None, hint_text=None, label=None, prefix=None, height=40,
+                 text_size=TEXT_SIZE):
         super().__init__()
         self.prefix = prefix
         self.prefix_style = ft.TextStyle(size=TEXT_SIZE, weight=ft.FontWeight.BOLD)
@@ -178,30 +178,32 @@ class ThemedField(ft.TextField):
 
 
 class FolderContainer(ft.Container):
-    def __init__(self, tag, folder_name: str, on_click=None,
-                 color=default_folder_color):
+    def __init__(self, tag,
+                 on_click,
+                 folder_name: str,
+                 color=default_folder_color, on_delete=None, ):
         super().__init__()
+        self.on_click = on_click
         self.tag = tag
         self.folder_name = folder_name
         self.bgcolor = secondary_color
         self.padding = LARGE_PADDING
         self.border_radius = ft.border_radius.all(RADIUS)
-        self.on_click = on_click
+        self.delete_btn = ft.IconButton(ft.icons.DELETE, on_click=on_delete)
         self.content = ft.Column(
             alignment=ft.MainAxisAlignment.CENTER,
-            controls=[ft.SafeArea(
-                content=ft.Container(
-                    border_radius=ft.border_radius.all(RADIUS),
-                    padding=ft.padding.symmetric(20, 40),
-                    bgcolor=primary_color,
-                    content=ft.Icon(ft.icons.FOLDER,
-                                    size=LARGEST_ICON,
-                                    color=color)
-                )),
-                ft.Row(controls=
-                       [ft.Text(self.folder_name, width=125)])
-            ]
-        )
+            controls=[
+                    ft.Container(
+                        border_radius=ft.border_radius.all(RADIUS),
+                        on_click=self.on_click,
+                        padding=ft.padding.symmetric(10, 50),
+                        bgcolor=primary_color,
+                        content=ft.Icon(ft.icons.FOLDER,
+                                        size=LARGEST_ICON,
+                                        color=color)),
+                    ft.Row(
+                        controls=[ft.Text(self.folder_name), self.delete_btn])
+                ])
 
 
 class DashboardContainer(ft.Container):
@@ -260,6 +262,8 @@ class SingleItemLogRow(ft.Container):
             ft.Text(str(files_moved), col=6),
             ft.Text(date, col=1)
         ])
+
+
 class SingleItemFileRow(ft.Container):
     def __init__(self, name: str, location: str, on_click=None):
         super().__init__()
@@ -275,7 +279,7 @@ class SingleItemFileRow(ft.Container):
 
 
 class SingleItemFormatRow(ft.Container):
-    def __init__(self, name: str, location: str, on_click=None):
+    def __init__(self, name: str, location: str, on_delete_click=None):
         super().__init__()
         self.col = 12
         self.padding = SMALL_PADDING
@@ -285,7 +289,7 @@ class SingleItemFormatRow(ft.Container):
             ft.Icon(ft.icons.CIRCLE, col=1),
             ft.Text(name, col=7),
             ft.Text(location, col=3),
-            ft.IconButton(ft.icons.DELETE, on_click=on_click, col=1, height=20, icon_size=15)
+            ft.IconButton(ft.icons.DELETE, on_click=on_delete_click, col=1, height=20, icon_size=15)
         ])
 
 

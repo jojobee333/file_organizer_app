@@ -3,17 +3,19 @@ import logging
 
 import flet as ft
 
-from backend.service import Service
 from frontend.components.components import Title, ScreenContainer, FolderContainer, blue_folder_color, ListScroller, \
-    SingleItemFileRow, PropertyColumn, Tag, CloseButton, BulletedItem
+    SingleItemFileRow, PropertyColumn, Tag, BulletedItem
+
+from frontend.controllers.screen_controller import ScreenController
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(funcName)s : %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class FolderScreen(ft.UserControl):
-    def __init__(self, col):
+    def __init__(self, col, screen_controller: ScreenController):
         super().__init__()
+        self.controller = screen_controller
         self.file_title = None
         self.target_title = None
         self.origin_title = None
@@ -23,7 +25,7 @@ class FolderScreen(ft.UserControl):
         self.ellipsis_btn = None
         self.file_list = None
         self.format_section = None
-        self.screen_row = None
+        self.screen_frame = None
         self.main_column = None
         self.format_title = None
         self.all_origins = None
@@ -34,9 +36,12 @@ class FolderScreen(ft.UserControl):
         self.screen_type = "folder"
 
     def get_data(self):
-        self.all_targets = Service().get_all_targets()["results"]
-        self.all_formats = Service().get_all_formats()["results"]
-        self.all_origins = Service().get_all_origins()["results"]
+        try:
+            self.all_targets = self.controller.get_targets()["results"]
+            self.all_formats = self.controller.get_formats()["results"]
+            self.all_origins = self.controller.get_origins()["results"]
+        except Exception as e:
+            logger.error(e)
 
     @staticmethod
     def populate_files(name, location):
@@ -50,13 +55,13 @@ class FolderScreen(ft.UserControl):
             self.file_list.controls.clear()
 
             if tag == Tag.NEW_ORIGIN:
-                origin = Service.get_origin_by_name(folder_name)
+                origin = self.controller.get_origin_by_name(folder_name)
                 path = origin["path"]
-                all_files = Service.get_origin_items(int(origin["id"]))
+                all_files = self.controller.get_origin_items(int(origin["id"]))
             elif tag == Tag.NEW_TARGET:
-                target = Service.get_target_by_name(folder_name)
+                target = self.controller.get_target_by_name(folder_name)
                 path = target["path"]
-                all_files = Service.get_target_items(int(target["id"]))
+                all_files = self.controller.get_target_items(int(target["id"]))
                 target_formats = [fmt for fmt in self.all_formats if fmt["target_id"] == target["id"]]
                 format_section = ft.Column(
                     controls=[Title("Formats"),
@@ -71,13 +76,13 @@ class FolderScreen(ft.UserControl):
                                            all_files]
             else:
                 self.file_list.controls.clear()
-            self.screen_row.controls.clear()
+            self.screen_frame.controls.clear()
             logger.info(path)
 
             self.main_column.col = 9
             self.property_column = self.create_property_column(folder_name=folder_name, path=path,
                                                                format_section=format_section, e=e)
-            self.screen_row.controls.append(self.property_column)
+            self.screen_frame.controls.append(self.property_column)
             await self.rebuild_page(e)
         except Exception as e:
             logger.error(e)
@@ -88,21 +93,21 @@ class FolderScreen(ft.UserControl):
                               format_section=format_section)
 
     async def clear_page(self, e):
-        self.screen_row.controls.clear()
+        self.screen_frame.controls.clear()
         self.file_list.controls.clear()
 
     async def rebuild_page(self, e):
-        self.screen_row.controls.insert(0, self.main_column)
+        self.screen_frame.controls.insert(0, self.main_column)
         await self.update_async()
 
     async def close_properties(self, e):
-        self.screen_row.controls.clear()
+        self.screen_frame.controls.clear()
         self.property_column = None
         self.main_column.col = 12
-        self.screen_row.controls.append(self.main_column)
+        self.screen_frame.controls.append(self.main_column)
         await self.update_async()
 
-    def populate_folders(self, tag: Tag, folder_name: str, delete_btn=None) -> FolderContainer:
+    def populate_folders(self, tag: Tag, folder_name: str, on_delete=None) -> FolderContainer:
         def on_click(e):
             asyncio.create_task(self.show_properties_and_files(e, folder_name=folder_name, tag=tag))
 
@@ -115,26 +120,41 @@ class FolderScreen(ft.UserControl):
         if tag != Tag.NEW_ORIGIN:
             folder_params["color"] = blue_folder_color
 
-        if delete_btn:
-            folder_params["delete_btn"] = delete_btn
+        if on_delete:
+            folder_params["on_delete"] = on_delete
 
         return FolderContainer(**folder_params)
 
-    async def delete_folder(self, e, tag):
+    async def delete_folder(self, e, folder_id: int, tag, name):
         try:
-            response = None
+            if tag == Tag.NEW_ORIGIN:
+                response = self.controller.delete_origin(origin_id=folder_id)
+                logger.info(self.origin_list.controls[-1].content.controls[-1].controls[0].value)
+                self.origin_list.controls = [control for control in self.origin_list.controls if
+                                             control.content.controls[-1].controls[0].value != name]
+            else:
+                response = self.controller.delete_target(target_id=folder_id)
+                self.target_list.controls = [control for control in self.target_list.controls if
+                                             control.content.controls[-1].controls[0].value != name]
+            await self.update_async()
         except Exception as e:
             logger.error(e)
 
     def get_components(self):
         self.format_title = Title("Folders", col=11)
         origin_controls = [
-            self.populate_folders(tag=Tag.NEW_ORIGIN, folder_name=origin["name"]) for origin in
-            self.all_origins] if self.all_origins else [ft.Text("None")]
+            self.populate_folders(tag=Tag.NEW_ORIGIN,
+                                  folder_name=origin["name"],
+                                  on_delete=lambda e: asyncio.create_task(
+                                      self.delete_folder(e=e, folder_id=origin["id"], tag=Tag.NEW_ORIGIN, name=origin["name"]))
+                                  ) for origin in self.all_origins] if self.all_origins else [ft.Text("None")]
 
         target_controls = [
-            self.populate_folders(tag=Tag.NEW_TARGET, folder_name=target["name"]) for target in
-            self.all_targets] if self.all_targets else [ft.Text("None")]
+            self.populate_folders(tag=Tag.NEW_TARGET,
+                                  folder_name=target["name"],
+                                  on_delete=lambda e: asyncio.create_task(
+                                      self.delete_folder(e=e, folder_id=target["id"], tag=Tag.NEW_TARGET, name=target["name"]))
+                                  ) for target in self.all_targets] if self.all_targets else [ft.Text("None")]
 
         self.title_divider = ft.Divider(thickness=0.0, height=1, color=ft.colors.WHITE)
         self.origin_title = Title("Origins")
@@ -163,14 +183,15 @@ class FolderScreen(ft.UserControl):
 
                 ]))
 
-        self.screen_row = ft.ResponsiveRow(controls=[
-            self.main_column,
-        ])
+        self.screen_frame = ft.ResponsiveRow(
+            col=12, controls=[
+                self.main_column,
+            ])
 
     def build(self):
         self.get_data()
         self.get_components()
 
         return ScreenContainer(
-            content=self.screen_row
+            content=self.screen_frame
         )
