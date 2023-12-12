@@ -60,7 +60,6 @@ class TopBar(ft.UserControl):
             await AlertHandler.open_alert(alert=self.alert, page=self.page)
         except Exception as e:
             logger.info(f"Error occurred: {e}")
-            await self.update_async()
 
     def build(self):
         app_title = ft.SafeArea(

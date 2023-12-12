@@ -30,6 +30,11 @@ class Service:
         return response.json()
 
     @staticmethod
+    def get_origin_by_id(origin_id: int):
+        response = requests.get(headers=HEADERS, url=f"{url_base}/origins/{origin_id}")
+        return response.json()
+
+    @staticmethod
     def get_target_by_name(target_name: str):
         response = requests.get(headers=HEADERS, url=f"{url_base}/targets/{target_name}")
         return response.json()
@@ -94,5 +99,6 @@ class Service:
 
     @staticmethod
     def move_files(origin_id: int, origin_path: str):
-        response = requests.post(url=f"{url_base}/move/?origin_id={origin_id}&origin_path={origin_path}")
+        url = f"{url_base}/run/?origin_id={origin_id}&origin_path={origin_path}"
+        response = requests.post(url=url)
         return response.json()

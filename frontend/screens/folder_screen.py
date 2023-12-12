@@ -1,6 +1,5 @@
 import asyncio
 import logging
-
 import flet as ft
 
 from frontend.components.components import Title, ScreenContainer, FolderContainer, blue_folder_color, ListScroller, \
@@ -89,7 +88,7 @@ class FolderScreen(ft.UserControl):
 
     def create_property_column(self, e, folder_name, path, format_section):
         return PropertyColumn(folder_name=folder_name, path=path,
-                              delete_click=self.close_properties,
+                              close_click=self.close_properties,
                               format_section=format_section)
 
     async def clear_page(self, e):
@@ -107,35 +106,39 @@ class FolderScreen(ft.UserControl):
         self.screen_frame.controls.append(self.main_column)
         await self.update_async()
 
-    def populate_folders(self, tag: Tag, folder_name: str, on_delete=None) -> FolderContainer:
-        def on_click(e):
+    def populate_folders(self, tag: Tag, folder_name: str, folder_id: int) -> FolderContainer:
+        def open_properties(e):
             asyncio.create_task(self.show_properties_and_files(e, folder_name=folder_name, tag=tag))
+
+        def delete(e):
+            asyncio.create_task(self.delete_folder(e, folder_id=folder_id, tag=tag, name=folder_name))
 
         folder_params = {
             "folder_name": folder_name,
-            "on_click": on_click,
+            "open_properties": open_properties,
+            "on_delete": delete,
             "tag": tag
         }
 
         if tag != Tag.NEW_ORIGIN:
             folder_params["color"] = blue_folder_color
 
-        if on_delete:
-            folder_params["on_delete"] = on_delete
-
         return FolderContainer(**folder_params)
 
     async def delete_folder(self, e, folder_id: int, tag, name):
+        logger.info(name)
         try:
             if tag == Tag.NEW_ORIGIN:
                 response = self.controller.delete_origin(origin_id=folder_id)
-                logger.info(self.origin_list.controls[-1].content.controls[-1].controls[0].value)
+                # TODO: set conditional logic to remove the control only if the response returns as valid
                 self.origin_list.controls = [control for control in self.origin_list.controls if
-                                             control.content.controls[-1].controls[0].value != name]
+                                             control.folder_name != name]
             else:
                 response = self.controller.delete_target(target_id=folder_id)
+                # TODO: set conditional logic to remove the control only if the response returns as valid
                 self.target_list.controls = [control for control in self.target_list.controls if
-                                             control.content.controls[-1].controls[0].value != name]
+                                             control.folder_name != name]
+            await self.close_properties(e)
             await self.update_async()
         except Exception as e:
             logger.error(e)
@@ -145,22 +148,20 @@ class FolderScreen(ft.UserControl):
         origin_controls = [
             self.populate_folders(tag=Tag.NEW_ORIGIN,
                                   folder_name=origin["name"],
-                                  on_delete=lambda e: asyncio.create_task(
-                                      self.delete_folder(e=e, folder_id=origin["id"], tag=Tag.NEW_ORIGIN, name=origin["name"]))
+                                  folder_id=origin["id"]
                                   ) for origin in self.all_origins] if self.all_origins else [ft.Text("None")]
 
         target_controls = [
             self.populate_folders(tag=Tag.NEW_TARGET,
                                   folder_name=target["name"],
-                                  on_delete=lambda e: asyncio.create_task(
-                                      self.delete_folder(e=e, folder_id=target["id"], tag=Tag.NEW_TARGET, name=target["name"]))
+                                  folder_id=target["id"]
                                   ) for target in self.all_targets] if self.all_targets else [ft.Text("None")]
 
         self.title_divider = ft.Divider(thickness=0.0, height=1, color=ft.colors.WHITE)
         self.origin_title = Title("Origins")
-        self.origin_list = ft.Row(controls=origin_controls)
+        self.origin_list = ft.Row(controls=origin_controls, scroll=ft.ScrollMode.AUTO)
         self.target_title = Title("Destinations")
-        self.target_list = ft.Row(controls=target_controls)
+        self.target_list = ft.Row(controls=target_controls, scroll=ft.ScrollMode.AUTO)
         self.file_title = Title("Files")
         self.file_list = ListScroller(controls=[])
 
@@ -191,7 +192,6 @@ class FolderScreen(ft.UserControl):
     def build(self):
         self.get_data()
         self.get_components()
-
         return ScreenContainer(
             content=self.screen_frame
         )

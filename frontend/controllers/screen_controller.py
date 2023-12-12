@@ -8,6 +8,12 @@ class ScreenController:
     def __init__(self, service):
         self.service = service
 
+    def move_files(self, origin_id, origin_path):
+        try:
+            return self.service.move_files(origin_id=origin_id, origin_path=origin_path)
+        except Exception as e:
+            logger.error(e)
+
     def get_format_by_name(self, format_name: str):
         try:
             return self.service.get_format_by_name(format_name)
@@ -69,6 +75,12 @@ class ScreenController:
         except Exception as e:
             logger.error(e)
 
+    def get_origin_by_id(self, origin_id: int):
+        try:
+            return self.service.get_origin_by_id(origin_id)
+        except Exception as e:
+            logger.error(e)
+
     def delete_origin(self, origin_id: int):
         try:
             return self.service.delete_origin(origin_id)
@@ -92,5 +104,3 @@ class ScreenController:
             return self.service.get_target_items(target_id)
         except Exception as e:
             logger.error(e)
-
-

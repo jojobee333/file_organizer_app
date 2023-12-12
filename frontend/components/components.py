@@ -23,6 +23,7 @@ primary_border_color = ft.colors.with_opacity(1.0, '#A7A9AC')
 primary_text_color = ft.colors.with_opacity(1.0, '#A7A9AC')
 default_folder_color = ft.colors.with_opacity(1.0, '#FFD770')
 blue_folder_color = ft.colors.with_opacity(1.0, '#84B3E0')
+small_isize = 14
 
 
 class Title(ft.Text):
@@ -108,20 +109,14 @@ class AlertBox(ft.AlertDialog):
 
 
 class PropertyColumn(ft.Container):
-    def __init__(self, folder_name: str, path: str, format_section, delete_click):
+    def __init__(self, folder_name: str, path: str, format_section, close_click):
         super().__init__()
         self.col = 3
-        self.popup_button = ft.PopupMenuButton(
-            height=25,
-            col=2,
-            scale=0.7,
-            items=[
-                ft.PopupMenuItem(text="Delete", on_click=delete_click)
-            ]
-
-        )
+        self.close_button = ft.IconButton(icon=ft.icons.CLOSE, on_click=close_click, col=2, height=ROW_HEIGHT,
+                                          icon_size=small_isize)
         self.padding = LARGE_PADDING
         self.bgcolor = primary_color
+        self.height=MAX_HEIGHT
         self.border = ft.border.only(left=ft.border.BorderSide(1, primary_border_color))
         self.divider = ft.Divider(thickness=0.0, height=1, color=ft.colors.WHITE)
         self.title = Title("Properties", col=10)
@@ -129,7 +124,7 @@ class PropertyColumn(ft.Container):
         self.content = ft.ResponsiveRow(
             controls=[
                 ft.ResponsiveRow(
-                    controls=[self.title, self.popup_button]),
+                    controls=[self.title, self.close_button]),
                 self.divider,
                 ft.Row(col=12,
                        alignment=ft.MainAxisAlignment.CENTER,
@@ -179,31 +174,40 @@ class ThemedField(ft.TextField):
 
 class FolderContainer(ft.Container):
     def __init__(self, tag,
-                 on_click,
+                 open_properties,
+                 on_delete,
                  folder_name: str,
-                 color=default_folder_color, on_delete=None, ):
+                 color=default_folder_color):
         super().__init__()
-        self.on_click = on_click
         self.tag = tag
         self.folder_name = folder_name
         self.bgcolor = secondary_color
-        self.padding = LARGE_PADDING
+        self.padding = ft.padding.all(10)
         self.border_radius = ft.border_radius.all(RADIUS)
-        self.delete_btn = ft.IconButton(ft.icons.DELETE, on_click=on_delete)
-        self.content = ft.Column(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                    ft.Container(
-                        border_radius=ft.border_radius.all(RADIUS),
-                        on_click=self.on_click,
-                        padding=ft.padding.symmetric(10, 50),
-                        bgcolor=primary_color,
-                        content=ft.Icon(ft.icons.FOLDER,
-                                        size=LARGEST_ICON,
-                                        color=color)),
-                    ft.Row(
-                        controls=[ft.Text(self.folder_name), self.delete_btn])
-                ])
+        self.actions_menu = ft.PopupMenuButton(
+            col=3,
+            height=ROW_HEIGHT,
+            scale=.8,
+            items=[
+
+                ft.PopupMenuItem(text="Properties", on_click=open_properties),
+                ft.PopupMenuItem(text="Delete Folder", on_click=on_delete)
+            ])
+        self.content = ft.Container(
+                bgcolor=secondary_color,
+                content=ft.Column(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    expand=True,
+                    controls=[
+                        ft.Container(
+                            padding=ft.padding.symmetric(5, 30),
+                            bgcolor=primary_color,
+                            content=ft.Icon(ft.icons.FOLDER, color=color, size=LARGEST_ICON)),
+                        ft.Row(controls=[ft.Text(self.folder_name, width=100), self.actions_menu])
+                    ])
+
+            )
+
 
 
 class DashboardContainer(ft.Container):
@@ -265,7 +269,7 @@ class SingleItemLogRow(ft.Container):
 
 
 class SingleItemFileRow(ft.Container):
-    def __init__(self, name: str, location: str, on_click=None):
+    def __init__(self, name: str, location: str):
         super().__init__()
         self.col = 12
         self.padding = SMALL_PADDING
